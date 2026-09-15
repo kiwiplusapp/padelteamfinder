@@ -1,6 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
+import { BRAND, imageUrl } from "@/data/images";
+import { hasAsset } from "@/lib/assets";
 
 /* ----------------------------------------------------------------------------
    Layout family: closing statement.
@@ -37,9 +40,25 @@ const FOOTER_LINKS = [
 ] as const;
 
 export function ClosingCta() {
+  const hasShot = hasAsset(BRAND.ballRacket);
+
   return (
     <>
-      <section className="rule-t py-20 md:py-32">
+      <section className="rule-t relative isolate overflow-hidden py-20 md:py-32">
+        {hasShot && (
+          <div className="absolute inset-0 -z-10" aria-hidden="true">
+            <Image
+              src={imageUrl(BRAND.ballRacket)}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+            {/* Heavy scrim: the headline is the message, the shot is texture. */}
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--color-cobalt-900)_0%,color-mix(in_oklab,var(--color-cobalt-900)_92%,transparent)_45%,color-mix(in_oklab,var(--color-cobalt-900)_70%,transparent)_100%)]" />
+          </div>
+        )}
+
         <div className="shell">
           <Reveal>
             <h2 className="max-w-[14ch] font-display text-[clamp(2.5rem,9vw,6.5rem)] leading-[0.86]">

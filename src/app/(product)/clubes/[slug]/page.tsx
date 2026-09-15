@@ -51,7 +51,7 @@ export default async function ClubPage({
         <Photo
           slot={CLUB_COVERS[club.id] ?? photo(club.slug, 1600, 900)}
           alt=""
-          priority
+          eager
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-cobalt-900 via-cobalt-900/70 to-cobalt-900/25" />

@@ -179,7 +179,7 @@ function ResponsiveCamera() {
  * Parallax. The whole scene leans toward the pointer, which gives the hero
  * depth without hijacking scroll or costing a React render per frame.
  */
-function Rig({ still }: { still: boolean }) {
+function Rig({ still, showCage }: { still: boolean; showCage: boolean }) {
   const group = useRef<THREE.Group>(null);
   const { pointer } = useThree();
   const target = useMemo(() => new THREE.Vector2(), []);
@@ -198,13 +198,20 @@ function Rig({ still }: { still: boolean }) {
 
   return (
     <group ref={group} position={[0, -1.2, 0]}>
-      <CourtCage />
+      {/* Suppressed when a photograph of a real court is already the field. */}
+      {showCage && <CourtCage />}
       <BallField still={still} />
     </group>
   );
 }
 
-export default function CourtScene({ still = false }: { still?: boolean }) {
+export default function CourtScene({
+  still = false,
+  showCage = true,
+}: {
+  still?: boolean;
+  showCage?: boolean;
+}) {
   return (
     <Canvas
       camera={{ position: [0, 3.2, 15], fov: 42 }}
@@ -217,7 +224,7 @@ export default function CourtScene({ still = false }: { still?: boolean }) {
       <directionalLight position={[6, 8, 4]} intensity={1.1} />
       <directionalLight position={[-8, 2, -6]} intensity={0.4} color={VOLT} />
       <ResponsiveCamera />
-      <Rig still={still} />
+      <Rig still={still} showCage={showCage} />
       <fog attach="fog" args={["#0a1a4f", 30, 62]} />
     </Canvas>
   );

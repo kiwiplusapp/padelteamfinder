@@ -1,31 +1,72 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import { useReducedMotion } from "motion/react";
-import { ArrowRight } from "@phosphor-icons/react";
+import Image from "next/image";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { ButtonLink } from "@/components/ui/button";
+import { HeroScene } from "./hero-scene";
+import { BRAND, HERO_CUTOUT, imageUrl } from "@/data/images";
+import { hasAsset } from "@/lib/assets";
 
-/**
- * The WebGL scene is client-only and code-split: it must never block the
- * headline, which is the LCP element. Until it resolves the hero renders on the
- * cobalt field alone and looks deliberate rather than unfinished.
- */
-const CourtScene = dynamic(() => import("@/components/three/court-scene"), {
-  ssr: false,
-});
+/* ----------------------------------------------------------------------------
+   Hero.
+
+   Two compositions, picked on the server by what is actually on disk:
+
+     with the court photograph  the photo is the field, and the WebGL layer
+                                drops its wireframe court (the photo already has
+                                one) keeping only the drifting balls, so the
+                                hero still moves without two courts fighting.
+
+     without it                 the WebGL court carries the whole frame, cage
+                                included.
+
+   Either way the headline is the LCP element and never waits on the canvas.
+   -------------------------------------------------------------------------- */
 
 export function Hero() {
-  // Honoured by the scene itself: reduced motion renders one still frame.
-  const reduce = useReducedMotion();
+  const hasCourt = hasAsset(BRAND.courtNight);
+  const hasCutout = hasAsset(HERO_CUTOUT);
 
   return (
     <section className="relative isolate flex min-h-[100dvh] flex-col justify-center overflow-hidden pt-16 pb-20 md:pt-24">
-      {/* Scene sits behind the type and never intercepts pointer events. */}
       <div className="absolute inset-0 -z-10" aria-hidden="true">
-        <CourtScene still={Boolean(reduce)} />
-        {/* Scrim: keeps the headline above WCAG AAA over a moving background. */}
-        <div className="absolute inset-0 bg-[linear-gradient(100deg,var(--color-cobalt-900)_0%,var(--color-cobalt-900)_34%,color-mix(in_oklab,var(--color-cobalt-900)_55%,transparent)_56%,transparent_78%)]" />
+        {hasCourt && (
+          <Image
+            src={imageUrl(BRAND.courtNight)}
+            alt=""
+            fill
+            sizes="100vw"
+            loading="eager"
+            fetchPriority="high"
+            className="object-cover"
+          />
+        )}
+
+        {/* The cage is redundant over a photograph of a real court. */}
+        <HeroScene showCage={!hasCourt} />
+
+        <div
+          className={
+            hasCourt
+              ? "absolute inset-0 bg-[linear-gradient(100deg,var(--color-cobalt-950)_0%,color-mix(in_oklab,var(--color-cobalt-950)_88%,transparent)_38%,color-mix(in_oklab,var(--color-cobalt-900)_55%,transparent)_62%,transparent_86%)]"
+              : "absolute inset-0 bg-[linear-gradient(100deg,var(--color-cobalt-900)_0%,var(--color-cobalt-900)_34%,color-mix(in_oklab,var(--color-cobalt-900)_55%,transparent)_56%,transparent_78%)]"
+          }
+        />
       </div>
+
+      {/* Optional cut-out player, anchored to the right edge on wide screens. */}
+      {hasCutout && (
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[42%] lg:block"
+          aria-hidden="true"
+        >
+          <Image
+            src={imageUrl(HERO_CUTOUT)}
+            alt=""
+            fill
+            sizes="42vw"
+            className="object-contain object-bottom"
+          />
+        </div>
+      )}
 
       <div className="shell grid w-full gap-10 lg:grid-cols-12">
         <div className="lg:col-span-8 xl:col-span-7">

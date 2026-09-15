@@ -152,15 +152,25 @@ recorrer (las llaves del landing), Three.js aislado en su propio leaf. Las tres
 librerías nunca comparten árbol de componentes. Todo degrada a estático bajo
 `prefers-reduced-motion`.
 
+El hero tiene dos composiciones y elige en el servidor según lo que haya en
+disco: con `court-night.jpg` la foto es el campo y la escena WebGL se queda solo
+con las bolas flotando (la jaula sobra sobre una foto de una pista de verdad);
+sin ella, la pista WebGL sostiene el encuadre entera.
+
 ---
 
 ## Pendiente
 
-- **Fotografía real.** `src/data/images.ts` declara cada hueco con su tema y su
-  proporción. Mientras no haya archivos en `/public/img`, cada hueco cae a una
-  foto estable de Picsum por semilla. El hueco del hero
-  (`/public/img/hero/player-cutout.png`, jugador recortado sobre fondo
-  transparente) es el único que una foto de stock no puede sustituir.
+- **Fotografía real.** Deja los archivos en `public/img/brand/` con los nombres
+  que indica `public/img/brand/README.md`. Cada sección comprueba en el servidor
+  si el archivo existe y se compone con él o sin él, así que no hay huecos ni
+  imágenes rotas en ningún estado. Las fichas de club y torneo siguen cayendo a
+  una foto estable de Picsum por semilla mientras no tengan la suya.
+
+  Dos avisos sobre las fotos entregadas: `court-balls.jpg` lleva marca de agua
+  de banco de imágenes y por eso está declarada pero sin usar, y
+  `player-celebration.jpg` muestra a un jugador reconocible con equipación de
+  patrocinador, lo que para producción necesita permiso de imagen.
 - **Autenticación.** No hay cuentas. La identidad se elige en un selector y se
   guarda en `localStorage` (`src/lib/use-current-player.ts`). Todos los
   endpoints de escritura ya reciben un `playerId` explícito, así que conectar

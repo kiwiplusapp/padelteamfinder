@@ -11,6 +11,12 @@ import { imageUrl, type ImageSlot } from "@/data/images";
    Renders the manifest's resolved URL and, if that image fails (offline, a club
    asset not yet uploaded), degrades to the brand field with the court's own
    line geometry rather than a grey box or a broken-image icon.
+
+   Above-the-fold images pass `eager`. Next 16 deprecated `priority` in favour
+   of `preload`, and the docs steer most cases to `loading="eager"` plus
+   `fetchPriority="high"` instead, which is what this does: these covers are
+   full-bleed and the LCP element varies by viewport, exactly the case the docs
+   say not to preload.
    -------------------------------------------------------------------------- */
 
 export function Photo({
@@ -18,14 +24,14 @@ export function Photo({
   alt,
   className,
   sizes = "(min-width: 1024px) 40vw, 100vw",
-  priority = false,
+  eager = false,
   fill = true,
 }: {
   slot: ImageSlot;
   alt: string;
   className?: string;
   sizes?: string;
-  priority?: boolean;
+  eager?: boolean;
   fill?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
@@ -40,7 +46,8 @@ export function Photo({
       alt={alt}
       fill={fill}
       sizes={sizes}
-      priority={priority}
+      loading={eager ? "eager" : "lazy"}
+      fetchPriority={eager ? "high" : "auto"}
       onError={() => setFailed(true)}
       className={cn("object-cover", className)}
     />
