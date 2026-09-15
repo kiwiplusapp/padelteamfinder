@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   PadelParty design tokens
+   ----------------------------------------------------------------------------
+   PALETTE LOCK: deep cobalt base, ONE accent (volt lime), warm off-white paper.
+   The accent is volt. It is the only accent on the entire product. Do not
+   introduce a second accent hue for status, badges or CTAs.
+
+   RADIUS RULE (documented, applied everywhere):
+     - interactive pills (buttons, filter chips, tabs) -> full round
+     - surfaces (cards, inputs, panels, media)         -> 2px, effectively sharp
+   The sporty editorial reference is sharp. Nothing in between is allowed.
+
+   THEME LOCK: the brand is the deep cobalt field. The product ships one theme
+   for the whole site so no section ever inverts mid-scroll. Both palettes are
+   expressed as tokens below, so flipping the default is a one-line change.
+   ========================================================================== */
+
+@theme {
+  /* Base field */
+  --color-ink: #070b18;
+  --color-cobalt-950: #050d2e;
+  --color-cobalt-900: #0a1a4f;
+  --color-cobalt-850: #0d2160;
+  --color-cobalt-800: #102a6e;
+  --color-cobalt-700: #17389a;
+  --color-cobalt-600: #1e46c4;
+  --color-cobalt-500: #2f5ce0;
+
+  /* The single accent */
+  --color-volt: #d4f31e;
+  --color-volt-bright: #e2ff4a;
+  --color-volt-dim: #a8c40f;
+  --color-volt-deep: #6d8006;
+
+  /* Paper / neutrals (never pure white, never pure black) */
+  --color-paper: #f4f2ea;
+  --color-paper-dim: #d9d6cb;
+  --color-paper-mute: #a8a498;
+
+  /* Clay is reserved for photography treatment only, never a UI accent */
+  --color-clay: #c2653a;
+
+  /* Type */
+  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
+  --font-mono: var(--font-mono-jb), ui-monospace, monospace;
+
+  /* Radius scale: only these two exist */
+  --radius-surface: 2px;
+  --radius-pill: 9999px;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* ----------------------------------------------------------------------------
+   Semantic surface tokens. Components reference these, never raw palette
+   values, so the theme can be retargeted in one place.
+   -------------------------------------------------------------------------- */
+:root {
+  --surface: var(--color-cobalt-900);
+  --surface-raised: var(--color-cobalt-850);
+  --surface-sunk: var(--color-cobalt-950);
+  --surface-inverse: var(--color-paper);
+
+  --text-primary: var(--color-paper);
+  --text-secondary: color-mix(in oklab, var(--color-paper) 68%, transparent);
+  --text-muted: color-mix(in oklab, var(--color-paper) 46%, transparent);
+  --text-on-accent: var(--color-ink);
+  --text-on-inverse: var(--color-ink);
+
+  --line: color-mix(in oklab, var(--color-paper) 14%, transparent);
+  --line-strong: color-mix(in oklab, var(--color-paper) 28%, transparent);
+
+  --accent: var(--color-volt);
+  --accent-text: var(--color-volt);
+
+  /* Z-index scale. Nothing outside this ladder. */
+  --z-raised: 10;
+  --z-sticky: 20;
+  --z-nav: 40;
+  --z-tabbar: 50;
+  --z-overlay: 60;
+  --z-grain: 70;
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background: var(--surface);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv01";
+    /* Prevent horizontal bleed from oversized display type */
+    overflow-x: hidden;
+  }
+
+  /* Display type is condensed, tight and loud by default */
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+  }
+
+  /* Tabular numerals everywhere a number carries meaning */
+  .nums {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background: var(--color-volt);
+    color: var(--color-ink);
+  }
+
+  /* Visible, on-brand focus ring. Never removed. */
+  :focus-visible {
+    outline: 2px solid var(--color-volt);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Native form controls inherit the field */
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  input[type="search"]::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}
+
+@layer utilities {
+  /* Page gutter, used by every section wrapper */
+  .shell {
+    width: 100%;
+    max-width: 1400px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .shell {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .shell {
+      padding-inline: 3rem;
+    }
+  }
+
+  /* Hairline rules used to organise real content, never as decoration */
+  .rule-t {
+    border-top: 1px solid var(--line);
+  }
+  .rule-b {
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* Edge-to-edge horizontal scrollers that still respect the page gutter */
+  .rail {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail > * {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+  }
+
+  /* Text that should clamp to N lines */
+  .clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Safe-area aware padding for the mobile tab bar */
+  .pb-safe {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  .mb-tabbar {
+    margin-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (min-width: 768px) {
+    .mb-tabbar {
+      margin-bottom: 0;
+    }
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Film grain. Fixed, pointer-events-none, never on a scrolling container, so
+   the GPU repaints once instead of every frame.
+   -------------------------------------------------------------------------- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ----------------------------------------------------------------------------
+   Global reduced-motion contract. Every animation in the product degrades to
+   an instant state change here, including GSAP and Motion driven ones.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Hero entrance.
+
+   Driven by the CSS cascade rather than a JS animation library: the hero sits
+   next to a WebGL canvas and the two should not compete for the first frames.
+   Each element sets --i and inherits the stagger.
+   -------------------------------------------------------------------------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    opacity: 0;
+    animation: rise 0.9s var(--ease-out-expo) forwards;
+    animation-delay: calc(var(--i, 0) * 90ms);
+  }
+}
+
+/* Under reduced motion the element is simply present from the start. */
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    opacity: 1;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Marquee. Exactly one per page, used where breadth matters more than any
+   individual item. Pure CSS so it costs no main-thread work, and it stops
+   entirely under reduced motion.
+   -------------------------------------------------------------------------- */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee 38s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
